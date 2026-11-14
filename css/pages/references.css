@@ -1,0 +1,21 @@
+/* =========================================================
+   ISH EDITION — References Page Styles
+   Client/creator reference showcase, quotes, review cards, and empty states.
+   ========================================================= */
+[data-page="references"] .notice{
+  padding:14px 18px;
+  border:1px solid var(--line);
+  background:rgba(255,31,31,.05);
+  border-left:3px solid var(--red);
+  font-size:.88rem;
+  color:#cfcfcf;
+  margin-bottom:28px;
+}
+[data-page="references"] .notice b{color:#fff}
+[data-page="references"] .empty-msg{
+  padding:48px 0;
+  text-align:center;
+  font-family:var(--mono);
+  color:var(--muted);
+  font-size:.9rem;
+}

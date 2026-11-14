@@ -1,0 +1,398 @@
+/* =========================================================
+   ISH EDITION — Skills Page Styles
+   Software tool cards, editing workflow steps, and skill tags.
+   ========================================================= */
+/* ---------- skills ---------- */
+.tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.tool{display:flex;align-items:center;gap:16px;padding:16px;background:var(--card);border:1px solid var(--line);transition:transform .35s var(--ease),border-color .3s}
+.tool:hover{transform:translateY(-4px);border-color:var(--red)}
+.tool .ico{flex:0 0 52px;height:52px;display:grid;place-items:center;border:2px solid var(--red);border-radius:10px;color:var(--red);font-family:var(--display);font-size:1.6rem;letter-spacing:.04em;transition:background .3s,color .3s}
+.tool:hover .ico{background:var(--red);color:#000}
+.tool b{display:block;font-weight:600;line-height:1.2}
+.tool small{color:var(--muted)}
+.style-list{border-bottom:1px solid var(--line)}
+.style-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:22px;align-items:center;padding:26px 0;border-top:1px solid var(--line);transition:padding .35s var(--ease),background .3s}
+.style-row h3{font-family:var(--display);font-weight:400;font-size:clamp(1.9rem,4vw,3rem);letter-spacing:.04em;text-transform:uppercase;line-height:1;transition:color .3s}
+.style-row p{color:var(--muted)}
+.style-row:hover{padding-left:16px;background:linear-gradient(90deg,rgba(255,31,31,.1),transparent)}
+.style-row:hover h3{color:var(--red)}
+.flow{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:18px}
+.step{position:relative;padding-top:24px;border-top:2px solid var(--line)}
+.step::before{content:"";position:absolute;left:0;top:-6px;width:10px;height:10px;background:var(--red)}
+.step b{display:block;font-family:var(--display);font-weight:400;font-size:1.5rem;letter-spacing:.05em;text-transform:uppercase}
+.step small{color:var(--muted);font-size:.86rem;display:block;line-height:1.4}
+
+
+/* =========================================
+   SOFTWARE & CREATIVE TOOLKIT
+========================================= */
+
+body[data-page="skills"] .page-hero {
+    padding-bottom: 0;
+}
+body[data-page="skills"] .page-hero .page-title {
+    margin-bottom: 0;
+}
+
+body[data-page="skills"] .toolkit-section {
+    padding-top: clamp(24px, 4vw, 40px);
+    padding-bottom: clamp(34px, 5vw, 50px);
+}
+
+.toolkit-intro {
+    color: var(--muted);
+    max-width: 58ch;
+    margin-bottom: 20px;
+}
+
+body[data-page="skills"] .formats-section {
+    padding-top: 0;
+    padding-bottom: clamp(34px, 5vw, 50px);
+}
+
+body[data-page="skills"] .workflow-section {
+    padding-top: 0;
+    padding-bottom: clamp(40px, 6vw, 64px);
+}
+
+.workflow-intro {
+    color: var(--muted);
+    max-width: 58ch;
+    margin-bottom: 18px;
+}
+
+.tool-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.tool-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    min-height: 145px;
+    padding: 24px;
+    overflow: hidden;
+
+    background: linear-gradient(
+        135deg,
+        rgba(255,255,255,.045),
+        rgba(255,255,255,.012)
+    );
+
+    border: 1px solid var(--line);
+    transition: border-color .3s ease,
+                transform .3s ease,
+                background .3s ease;
+}
+
+.tool-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 18%;
+    height: 64%;
+    width: 2px;
+    background: var(--red);
+    opacity: .65;
+}
+
+.tool-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255,31,31,.55);
+    background: rgba(255,255,255,.055);
+}
+
+.tool-icon {
+    flex: 0 0 66px;
+    width: 66px;
+    height: 66px;
+    display: grid;
+    place-items: center;
+    background: rgba(0,0,0,.35);
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 12px;
+}
+
+.tool-icon img {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+}
+
+.encoder-icon span {
+    font-family: var(--display);
+    font-size: 2rem;
+    color: #a8a8ff;
+    letter-spacing: .04em;
+}
+
+.tool-info {
+    min-width: 0;
+}
+
+.tool-category {
+    display: block;
+    font-family: var(--mono);
+    font-size: .62rem;
+    letter-spacing: .15em;
+    color: var(--red);
+    margin-bottom: 7px;
+}
+
+.tool-info h3 {
+    font-family: var(--display);
+    font-size: 1.65rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: .035em;
+    margin-bottom: 5px;
+}
+
+.tool-info p {
+    font-size: .88rem;
+    line-height: 1.6;
+    color: var(--muted);
+    max-width: 38ch;
+}
+
+.tool-number {
+    position: absolute;
+    top: 13px;
+    right: 16px;
+    font-family: var(--mono);
+    font-size: .65rem;
+    color: rgba(255,255,255,.3);
+}
+
+
+/* =========================================
+   EDITING WORKFLOW
+========================================= */
+
+.workflow-section {
+    position: relative;
+}
+
+.workflow-list {
+    position: relative;
+    border-top: 1px solid var(--line);
+}
+
+.workflow-step {
+    position: relative;
+    display: grid;
+    grid-template-columns: 65px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 22px;
+    padding: 28px 12px;
+    border-bottom: 1px solid var(--line);
+    transition: background .3s ease,
+                padding .3s ease;
+}
+
+.workflow-step:hover {
+    background: rgba(255,255,255,.025);
+    padding-left: 20px;
+}
+
+.workflow-index {
+    font-family: var(--display);
+    font-size: 2.4rem;
+    color: var(--red);
+    line-height: 1;
+}
+
+.workflow-label {
+    display: block;
+    font-family: var(--mono);
+    font-size: .65rem;
+    letter-spacing: .16em;
+    color: var(--red);
+    margin-bottom: 7px;
+}
+
+.workflow-content h3 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 1.65rem;
+    text-transform: uppercase;
+    letter-spacing: .035em;
+    margin-bottom: 6px;
+}
+
+.workflow-content p {
+    color: var(--muted);
+    font-size: .9rem;
+    line-height: 1.65;
+    max-width: 62ch;
+}
+
+.workflow-tool {
+    font-family: var(--mono);
+    font-size: .65rem;
+    letter-spacing: .12em;
+    color: rgba(255,255,255,.55);
+    padding: 9px 12px;
+    border: 1px solid var(--line);
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 700px) {
+    .tool-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tool-card {
+        min-height: 125px;
+        padding: 19px;
+    }
+
+    .workflow-step {
+        grid-template-columns: 42px minmax(0, 1fr);
+        gap: 14px;
+        padding: 24px 5px;
+    }
+
+    .workflow-index {
+        font-size: 1.9rem;
+    }
+
+    .workflow-content h3 {
+        font-size: 1.4rem;
+    }
+
+    .workflow-tool {
+        grid-column: 2;
+        justify-self: start;
+        margin-top: 5px;
+    }
+}
+
+@media (max-width: 420px) {
+    .tool-icon {
+        flex-basis: 54px;
+        width: 54px;
+        height: 54px;
+    }
+
+    .tool-icon img {
+        width: 34px;
+        height: 34px;
+    }
+
+    .tool-info h3 {
+        font-size: 1.4rem;
+    }
+}
+
+
+/* CONNECTED EDITING WORKFLOW */
+
+.workflow-flow {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.flow-node {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    padding: 22px 15px;
+    background: linear-gradient(145deg, #151515, #0a0a0a);
+    border: 1px solid var(--line);
+    transition: .3s ease;
+}
+
+.flow-node:hover {
+    border-color: var(--red);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(255,31,31,.10);
+}
+
+.flow-number {
+    display: block;
+    font-family: var(--mono);
+    font-size: .68rem;
+    color: var(--red);
+    margin-bottom: 12px;
+}
+
+.flow-icon {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    margin-bottom: 14px;
+    border: 1px solid rgba(255,31,31,.35);
+    background: rgba(255,31,31,.07);
+    color: var(--red);
+    font-size: 1.4rem;
+}
+
+.flow-node h3 {
+    font-family: var(--display);
+    font-size: 1.35rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.flow-node p {
+    color: var(--muted);
+    font-size: .78rem;
+    line-height: 1.6;
+    min-height: 50px;
+}
+
+.flow-node small {
+    display: block;
+    font-family: var(--mono);
+    font-size: .57rem;
+    letter-spacing: .1em;
+    color: var(--red);
+    margin-top: 14px;
+}
+
+.flow-connector {
+    display: flex;
+    align-items: center;
+    color: var(--red);
+    font-size: 1.25rem;
+    opacity: .75;
+}
+
+@media(max-width: 900px) {
+    .workflow-flow {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+
+    .flow-connector {
+        display: none;
+    }
+}
+
+@media(max-width: 420px) {
+    .workflow-flow {
+        grid-template-columns: 1fr;
+    }
+
+    .flow-node {
+        padding: 20px;
+    }
+
+    .flow-node p {
+        min-height: 0;
+    }
+}

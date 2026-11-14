@@ -1,0 +1,21 @@
+/* =========================================================
+   ISH EDITION — Variables & Theme Settings
+   Theme: RED + BLACK. Change the colors in :root below.
+   ========================================================= */
+:root{
+  --red:#ff1f1f;
+  --red-d:#b80000;
+  --red-glow:rgba(255,31,31,.38);
+  --bg:#070707;
+  --bg-2:#0d0d0d;
+  --card:#111;
+  --line:#262626;
+  --text:#f4f4f4;
+  --muted:#9b9b9b;
+  --display:"Bebas Neue",Impact,"Arial Narrow",sans-serif;
+  --body:"Space Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --maxw:1200px;
+  --pad:clamp(16px,4vw,40px);
+  --ease:cubic-bezier(.2,.8,.2,1);
+}

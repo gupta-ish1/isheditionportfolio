@@ -1,0 +1,23 @@
+/* =========================================================
+   ISH EDITION — Master Stylesheet
+   Imports all common modules and page-specific styles in precise cascade order.
+   ========================================================= */
+
+/* Common foundation & shared components */
+@import url("common/variables.css");
+@import url("common/base.css");
+@import url("common/background.css");
+@import url("common/header.css");
+@import url("common/footer.css");
+@import url("common/animations.css");
+
+/* Page-specific styles */
+@import url("pages/home.css");
+@import url("pages/about.css");
+@import url("pages/skills.css");
+@import url("pages/editing-styles.css");
+@import url("pages/references.css");
+@import url("pages/contact.css");
+
+/* Shared responsive layout breakpoints & reduced motion */
+@import url("common/responsive.css");

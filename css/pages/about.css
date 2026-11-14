@@ -1,0 +1,309 @@
+
+/* =========================================
+   ABOUT SECTION - ISH EDITION
+   CINEMATIC / VFX PORTRAIT DESIGN
+========================================= */
+
+/* ABOUT GRID */
+.about-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(28px, 5vw, 72px);
+    align-items: start;
+}
+
+/* =========================================
+   CINEMATIC PORTRAIT FRAME
+========================================= */
+
+.frame {
+    position: relative;
+    isolation: isolate;
+    aspect-ratio: 4 / 5;
+    background: #08090d;
+    border: 1px solid rgba(255,255,255,.13);
+    overflow: hidden;
+
+    box-shadow:
+        0 25px 60px rgba(0,0,0,.65),
+        0 0 25px rgba(255,25,50,.10),
+        inset 0 0 35px rgba(0,0,0,.5);
+}
+
+/* Remove old ISH watermark */
+.frame::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+
+    background:
+        linear-gradient(135deg,
+            rgba(255,255,255,.08),
+            transparent 25%,
+            transparent 75%,
+            rgba(255,25,45,.10)
+        ),
+        linear-gradient(0deg,
+            rgba(0,0,0,.42),
+            transparent 35%,
+            transparent 75%,
+            rgba(0,0,0,.18)
+        );
+}
+
+/* PORTRAIT IMAGE */
+.frame img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+
+    filter:
+        brightness(.86)
+        contrast(1.16)
+        saturate(.88)
+        sepia(.06);
+
+    transform: scale(1.015);
+    transition: filter .5s ease, transform .7s ease;
+
+    animation: portraitGlitch 8s infinite;
+}
+
+/* =========================================
+   RGB GLITCH / SCANLINE OVERLAY
+========================================= */
+
+.frame::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            transparent 0px,
+            transparent 3px,
+            rgba(255,255,255,.045) 4px
+        ),
+        linear-gradient(
+            110deg,
+            transparent 35%,
+            rgba(255,20,45,.13) 50%,
+            transparent 65%
+        );
+
+    opacity: .35;
+    mix-blend-mode: screen;
+}
+
+/* Occasional image glitch */
+
+
+/* =========================================
+   PREMIUM ANGULAR FRAME
+========================================= */
+
+.frame .corner {
+    position: absolute;
+    width: 44px;
+    height: 44px;
+    z-index: 5;
+    pointer-events: none;
+    border: 0;
+}
+
+/* TOP LEFT */
+.frame .c1 {
+    top: 0;
+    left: 0;
+    border-top: 2px solid #ff263f;
+    border-left: 2px solid #ff263f;
+    box-shadow: -3px -3px 12px rgba(255,38,63,.35);
+}
+
+/* TOP RIGHT */
+.frame .c2 {
+    top: 0;
+    right: 0;
+    border-top: 2px solid #ff263f;
+    border-right: 2px solid #ff263f;
+    box-shadow: 3px -3px 12px rgba(255,38,63,.35);
+}
+
+/* BOTTOM LEFT */
+.frame .c3 {
+    bottom: 0;
+    left: 0;
+    border-bottom: 2px solid #ff263f;
+    border-left: 2px solid #ff263f;
+    box-shadow: -3px 3px 12px rgba(255,38,63,.35);
+}
+
+/* BOTTOM RIGHT */
+.frame .c4 {
+    bottom: 0;
+    right: 0;
+    border-bottom: 2px solid #ff263f;
+    border-right: 2px solid #ff263f;
+    box-shadow: 3px 3px 12px rgba(255,38,63,.35);
+}
+
+/* =========================================
+   CAMERA LABEL
+========================================= */
+
+.frame .cam {
+    position: absolute;
+    z-index: 6;
+    left: 52px;
+    top: 18px;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    font-family: var(--mono);
+    font-size: .7rem;
+    letter-spacing: .18em;
+    color: #fff;
+
+    text-shadow: 0 1px 8px #000;
+}
+
+/* =========================================
+   ABOUT CONTENT
+========================================= */
+
+.about-copy p {
+    color: #cfcfcf;
+    margin-bottom: 18px;
+    max-width: 62ch;
+}
+
+/* FACTS */
+.facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin: 30px 0 0;
+}
+
+.fact {
+    padding: 16px 18px;
+    border: 1px solid var(--line);
+    background: var(--card);
+}
+
+.fact small {
+    display: block;
+    font-family: var(--mono);
+    font-size: .66rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 4px;
+}
+
+.fact b {
+    font-weight: 500;
+}
+
+/* =========================================
+   EXPERIENCE TIMELINE
+========================================= */
+
+.xp {
+    margin-top: 20px;
+}
+
+.xp-item {
+    position: relative;
+    padding: 0 0 38px 30px;
+    border-left: 2px solid var(--line);
+}
+
+.xp-item:last-child {
+    padding-bottom: 0;
+}
+
+.xp-item::before {
+    content: "";
+    position: absolute;
+    left: -7px;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    background: var(--red);
+
+    box-shadow:
+        0 0 0 4px var(--bg),
+        0 0 14px var(--red-glow);
+}
+
+.xp-year {
+    font-family: var(--mono);
+    font-size: .74rem;
+    letter-spacing: .18em;
+    color: var(--red);
+    text-transform: uppercase;
+}
+
+.xp-item h3 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 1.8rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    margin: 2px 0 4px;
+}
+
+.xp-item p {
+    color: var(--muted);
+    max-width: 56ch;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 800px) {
+    .about-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+
+    .frame {
+        max-width: 440px;
+        width: 100%;
+        margin-inline: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .frame .corner {
+        width: 32px;
+        height: 32px;
+    }
+
+    .facts {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .fact {
+        padding: 13px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .frame img {
+        animation: none;
+        transition: none;
+    }
+}

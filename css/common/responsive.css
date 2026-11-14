@@ -1,0 +1,52 @@
+/* =========================================================
+   ISH EDITION — Shared Responsive & Reduced Motion
+   Global layout breakpoints and accessibility preferences.
+   ========================================================= */
+@media (max-width:980px){
+  .about-grid,.contact-grid{grid-template-columns:1fr}
+  .frame{max-width:420px}
+  .flow{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:34px}
+}
+
+@media (max-width:860px){
+  .burger{display:flex}
+  .nav{
+    position:fixed;inset:0;z-index:2;flex-direction:column;align-items:center;justify-content:center;gap:26px;
+    background:rgba(7,7,7,.97);opacity:0;pointer-events:none;transform:translateY(-12px);
+    transition:opacity .3s,transform .4s var(--ease);
+  }
+  html.nav-open .nav{opacity:1;pointer-events:auto;transform:none}
+  .nav a{font-size:1.1rem}
+  html.nav-open .nav a{animation:navSceneIn .24s var(--ease) both}
+  html.nav-open .nav a:nth-child(2){animation-delay:25ms}
+  html.nav-open .nav a:nth-child(3){animation-delay:50ms}
+  html.nav-open .nav a:nth-child(4){animation-delay:75ms}
+  html.nav-open .nav a:nth-child(5){animation-delay:100ms}
+  html.nav-open .nav a:nth-child(6){animation-delay:125ms}
+  .ambient-apps{display:none}
+}
+@media (max-width:640px){
+  .marquee{padding:16px 0}
+  .marquee-track span{padding-right:30px}
+  .marquee-track span::after{margin-left:30px}
+  .style-row{grid-template-columns:1fr;gap:8px}
+  .flow{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .grid{column-width:240px}
+  .cta-band .wrap{flex-direction:column;align-items:flex-start}
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  ::view-transition-old(root),::view-transition-new(root){animation:none!important}
+  .marquee-track{animation:none!important}
+  .js .reveal{opacity:1;transform:none}
+  .ambient-path,.ambient-path path,.ambient-speed-ramp,.path-node,.hero::after,.edit-term,.audio-bar,.track-box::before,.portrait-rimlight{animation:none!important}
+  .ambient-graph path,.ambient-graph circle,.ambient-key,.ambient-wave,.tw-cursor{animation:none!important;opacity:1!important;transform:none!important;filter:none!important}
+  .edit-term{display:none;filter:none;transform:none}
+  .edit-term.term-cut,.edit-term.term-export{display:block;opacity:.3}
+  .tool-button::after{display:none}
+  .playhead{animation:none!important;left:45%!important}
+}
+@media (max-width:360px){
+}
