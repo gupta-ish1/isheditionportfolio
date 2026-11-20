@@ -1,4 +1,9 @@
-/* Video grid: all visible videos play at once (muted loops), click = full player */
+/* =========================================================
+   ISH EDITION — Video Grid & Modal Controller
+   Dynamic rendering, hover/tap preview loops, single-playback management,
+   lazy loading, 32-video balanced "All" selection, category filtering,
+   complete title removal, native cursor enforcement, and modal player.
+   ========================================================= */
 (function () {
   'use strict';
 
@@ -12,22 +17,27 @@
   var items = limit > 0 ? all.slice(0, limit) : all;
   var isRef = source === 'references';
 
-  var YT = /^[\w-]{6,15}$/;
   var RATIO = /^\d+(\.\d+)?\s*\/\s*\d+(\.\d+)?$/;
 
   var cards = [];
-  var visible = [];          // videos currently near the viewport
   var modal = null, stage = null, info = null, lastFocus = null;
   var modalOpen = false;
   var io = null;
 
-  function ratioStr(r) { return RATIO.test(String(r || '')) ? String(r).replace(/\s+/g, '') : '16/9'; }
+  var activeCard = null;
+  var activeVideo = null;
+
+  /* ---------- helpers ---------- */
+  function ratioStr(r) {
+    return RATIO.test(String(r || '')) ? String(r).replace(/\s+/g, '') : '16/9';
+  }
+
   function ratioNum(r) {
     var p = ratioStr(r).split('/');
     var n = parseFloat(p[0]) / parseFloat(p[1]);
     return n > 0 ? n : 16 / 9;
   }
-  function safeUrl(u) { return /^https?:\/\//i.test(u || '') ? u : ''; }
+
   function span(cls, text) {
     var s = document.createElement('span');
     s.className = cls;
@@ -35,91 +45,265 @@
     return s;
   }
 
-  /* ---------- play / pause helpers ---------- */
-  function startVideo(v) {
+  /* Fisher-Yates array shuffle */
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i];
+      a[i] = a[j];
+      a[j] = tmp;
+    }
+    return a;
+  }
+
+  /* ---------- category grouping & stable 32-video "All" selection ---------- */
+  var byCategory = {};
+  items.forEach(function (it) {
+    var cat = it.category || 'Other';
+    if (!byCategory[cat]) byCategory[cat] = [];
+    byCategory[cat].push(it);
+  });
+
+  /*
+    Stable "All" selection:
+    Pick exactly 4 videos per category (32 videos across 8 categories).
+    Interleave them non-consecutively across 4 rounds so categories are never grouped together.
+    This selection stays stable while the user browses and toggles filters.
+  */
+  var allMixedItems = [];
+  (function buildAllSelection() {
+    var cats = (DATA.categories || Object.keys(byCategory)).filter(function (c) {
+      return byCategory[c] && byCategory[c].length > 0;
+    });
+
+    var selectedByCat = {};
+    cats.forEach(function (cat) {
+      selectedByCat[cat] = shuffle(byCategory[cat]).slice(0, 4);
+    });
+
+    var lastCat = null;
+    for (var round = 0; round < 4; round++) {
+      var roundCats = shuffle(cats);
+      // Ensure the first category of this round doesn't match the last category of the previous round
+      if (lastCat && roundCats.length > 1 && roundCats[0] === lastCat) {
+        var swapIdx = Math.floor(Math.random() * (roundCats.length - 1)) + 1;
+        var t = roundCats[0];
+        roundCats[0] = roundCats[swapIdx];
+        roundCats[swapIdx] = t;
+      }
+      roundCats.forEach(function (cat) {
+        if (selectedByCat[cat] && selectedByCat[cat][round]) {
+          allMixedItems.push(selectedByCat[cat][round]);
+          lastCat = cat;
+        }
+      });
+    }
+  })();
+
+  /* ---------- preview playback control (strictly one at a time) ---------- */
+  function playCardPreview(card) {
+    if (!card || modalOpen) return;
+    var v = card.querySelector('video');
+    if (!v) return;
+
+    if (activeCard && activeCard !== card) {
+      stopCardPreview(activeCard);
+    }
+
     if (!v.getAttribute('src') && v.getAttribute('data-src')) {
       v.src = v.getAttribute('data-src');
     }
     v.muted = true;
-    var p = v.play();
-    if (p && p.catch) p.catch(function () { /* autoplay blocked: poster/first frame stays, tap opens player */ });
-  }
-  function indexOfVideo(v) { return visible.indexOf(v); }
+    card.classList.add('is-playing');
+    activeCard = card;
+    activeVideo = v;
 
-  /* ---------- build one card ---------- */
+    var p = v.play();
+    if (p && p.catch) {
+      p.catch(function () {});
+    }
+  }
+
+  function stopCardPreview(card) {
+    if (!card) return;
+    var v = card.querySelector('video');
+    if (v) {
+      v.pause();
+    }
+    card.classList.remove('is-playing');
+    if (activeCard === card) {
+      activeCard = null;
+      activeVideo = null;
+    }
+  }
+
+  function stopAllPreviews() {
+    if (activeCard) {
+      stopCardPreview(activeCard);
+    }
+  }
+
+  /* ---------- build card (clean edge-to-edge, NO titles or text) ---------- */
   function makeCard(item) {
     var btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'card';
     btn.setAttribute('data-cat', item.category || '');
-    btn.setAttribute('aria-label', 'Play video: ' + (item.title || 'untitled'));
+    btn.setAttribute('data-ratio', ratioStr(item.ratio));
+    btn.setAttribute('aria-label', 'Play video');
 
     var media = span('media');
     media.style.setProperty('--ratio', ratioStr(item.ratio));
 
     if (item.preview) {
       var v = document.createElement('video');
-      v.muted = true; v.loop = true; v.playsInline = true;
-      v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('webkit-playsinline', '');
+      v.muted = true;
+      v.loop = true;
+      v.playsInline = true;
+      v.setAttribute('muted', '');
+      v.setAttribute('playsinline', '');
+      v.setAttribute('webkit-playsinline', '');
       v.setAttribute('disablepictureinpicture', '');
       v.preload = 'none';
       v.setAttribute('data-src', item.preview);
-      if (item.poster) v.poster = item.poster;
-      v.addEventListener('error', function () { media.classList.add('empty'); v.style.display = 'none'; });
+      v.addEventListener('error', function () {
+        media.classList.add('empty');
+        v.style.display = 'none';
+      });
       media.appendChild(v);
-    } else if (item.youtube && YT.test(item.youtube)) {
-      var img = document.createElement('img');
-      img.src = 'https://i.ytimg.com/vi/' + item.youtube + '/hqdefault.jpg';
-      img.alt = '';
-      img.loading = 'lazy';
-      media.appendChild(img);
     } else {
       media.classList.add('empty');
     }
 
-    btn.appendChild(media);
-    btn.appendChild(span('shade'));
-    btn.appendChild(span('play'));
-    var meta = span('meta');
-    meta.appendChild(span('tag', item.category || ''));
-    meta.appendChild(span('title', item.title || ''));
-    btn.appendChild(meta);
+    var playBtn = span('play');
+    playBtn.setAttribute('title', 'Play full video');
+    playBtn.setAttribute('aria-label', 'Play full video');
 
-    btn.addEventListener('click', function () { openModal(item, btn); });
+    btn.appendChild(media);
+    btn.appendChild(playBtn);
+
+    // Track touch interactions vs mouse
+    var lastTapTime = 0;
+    var touchedThisCard = false;
+
+    btn.addEventListener('touchstart', function () {
+      touchedThisCard = true;
+    }, { passive: true });
+
+    // Desktop hover behavior: play on enter, pause on leave
+    btn.addEventListener('mouseenter', function () {
+      if (modalOpen) return;
+      playCardPreview(btn);
+    });
+
+    btn.addEventListener('mouseleave', function () {
+      stopCardPreview(btn);
+    });
+
+    // Click & Touch tap interaction
+    btn.addEventListener('click', function (e) {
+      // Keyboard enter/space triggers click with detail 0 -> open modal
+      if (e.detail === 0) {
+        stopCardPreview(btn);
+        openModal(item, btn);
+        return;
+      }
+
+      // If user clicked the play icon: open modal
+      if (e.target.closest && e.target.closest('.play')) {
+        stopCardPreview(btn);
+        openModal(item, btn);
+        return;
+      }
+
+      // Quick double-tap anywhere on card: open modal
+      var now = Date.now();
+      if (now - lastTapTime < 350) {
+        lastTapTime = 0;
+        stopCardPreview(btn);
+        openModal(item, btn);
+        return;
+      }
+      lastTapTime = now;
+
+      // Desktop mouse click: open modal immediately
+      var hasHover = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+      if (hasHover && !touchedThisCard) {
+        stopCardPreview(btn);
+        openModal(item, btn);
+        return;
+      }
+
+      // Mobile touch on video area: toggle play/pause preview
+      if (activeCard === btn) {
+        stopCardPreview(btn);
+      } else {
+        playCardPreview(btn);
+      }
+    });
+
+    item._card = btn;
     return btn;
   }
 
-  /* ---------- observer: play what you can see, pause the rest ---------- */
+  /* ---------- lazy loader via IntersectionObserver ---------- */
   function setupObserver() {
     if (!('IntersectionObserver' in window)) {
       cards.forEach(function (c) {
         var v = c.querySelector('video');
-        if (v) { visible.push(v); startVideo(v); }
+        if (v && !v.getAttribute('src') && v.getAttribute('data-src')) {
+          v.src = v.getAttribute('data-src');
+          v.preload = 'metadata';
+        }
       });
       return;
     }
+
     io = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {
-        var v = en.target.querySelector('video');
+        var card = en.target;
+        var v = card.querySelector('video');
         if (!v) return;
+
         if (en.isIntersecting) {
-          if (indexOfVideo(v) < 0) visible.push(v);
-          if (!modalOpen) startVideo(v);
+          if (!v.getAttribute('src') && v.getAttribute('data-src')) {
+            v.src = v.getAttribute('data-src');
+            v.preload = 'metadata';
+          }
         } else {
-          var i = indexOfVideo(v);
-          if (i >= 0) visible.splice(i, 1);
-          v.pause();
+          if (activeCard === card) {
+            stopCardPreview(card);
+          }
         }
       });
-    }, { rootMargin: '150px 0px', threshold: 0.01 });
+    }, { rootMargin: '250px 0px', threshold: 0.01 });
+
     cards.forEach(function (c) { io.observe(c); });
   }
 
-  /* ---------- filters ---------- */
+  /* ---------- display list in grid ---------- */
+  function displayItems(itemList) {
+    grid.innerHTML = '';
+    var frag = document.createDocumentFragment();
+    itemList.forEach(function (it) {
+      if (it._card) {
+        it._card.hidden = false;
+        frag.appendChild(it._card);
+        if (io) io.observe(it._card);
+      }
+    });
+    grid.appendChild(frag);
+
+    var empty = document.getElementById('empty');
+    if (empty) empty.hidden = itemList.length > 0;
+  }
+
+  /* ---------- category filters ---------- */
   function setupFilters() {
     var host = document.getElementById('filters');
-    var empty = document.getElementById('empty');
     if (!host) return;
+
     var present = {};
     items.forEach(function (it) { if (it.category) present[it.category] = true; });
     var order = (DATA.categories || []).filter(function (c) { return present[c]; });
@@ -134,24 +318,26 @@
       b.textContent = name;
       b.setAttribute('aria-pressed', idx === 0 ? 'true' : 'false');
       b.addEventListener('click', function () {
+        stopAllPreviews();
         host.querySelectorAll('.chip').forEach(function (c) {
           var on = c === b;
           c.classList.toggle('active', on);
           c.setAttribute('aria-pressed', on ? 'true' : 'false');
         });
-        var shown = 0;
-        cards.forEach(function (card) {
-          var show = name === 'All' || card.getAttribute('data-cat') === name;
-          card.hidden = !show;
-          if (show) shown++;
-        });
-        if (empty) empty.hidden = shown > 0;
+
+        if (name === 'All') {
+          // Show stable 32-video balanced mixed selection
+          displayItems(allMixedItems);
+        } else {
+          // Show all videos belonging to the selected category
+          displayItems(byCategory[name] || []);
+        }
       });
       host.appendChild(b);
     });
   }
 
-  /* ---------- modal player ---------- */
+  /* ---------- modal player (NO title, category only) ---------- */
   function buildModal() {
     modal = document.createElement('div');
     modal.className = 'modal';
@@ -172,7 +358,7 @@
     document.addEventListener('keydown', function (e) {
       if (modal.hidden) return;
       if (e.key === 'Escape') { closeModal(); return; }
-      if (e.key === 'Tab') {   // keep keyboard focus inside the popup
+      if (e.key === 'Tab') {
         var f = modal.querySelectorAll('button,a[href],video[controls]');
         if (!f.length) return;
         var first = f[0], last = f[f.length - 1];
@@ -186,50 +372,39 @@
     if (!modal) buildModal();
     lastFocus = opener;
     modalOpen = true;
-    visible.forEach(function (v) { v.pause(); });
+    stopAllPreviews();
 
     stage.innerHTML = '';
     var num = ratioNum(item.ratio);
     stage.style.setProperty('--r', num);
     info.style.setProperty('--r', num);
 
-    var node;
-    if (item.youtube && YT.test(item.youtube)) {
-      node = document.createElement('iframe');
-      node.src = 'https://www.youtube-nocookie.com/embed/' + item.youtube + '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
-      node.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
-      node.setAttribute('allowfullscreen', '');
-      node.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
-      node.title = item.title || 'Video';
-    } else {
-      node = document.createElement('video');
-      node.controls = true;
-      node.playsInline = true;
-      node.setAttribute('playsinline', '');
-      node.preload = 'auto';
-      node.src = item.full || item.preview || '';
-      var p = node.play();
-      if (p && p.catch) p.catch(function () { /* user can press play */ });
-    }
+    var videoSrc = item.full || item.preview || '';
+    var node = document.createElement('video');
+    node.controls = true;
+    node.playsInline = true;
+    node.setAttribute('playsinline', '');
+    node.preload = 'auto';
+    node.src = videoSrc;
+
+    node.addEventListener('error', function () {
+      var err = document.createElement('div');
+      err.style.cssText = 'padding:40px;color:var(--muted);text-align:center;font-family:var(--mono);font-size:.85rem;';
+      err.textContent = 'Unable to play video';
+      stage.appendChild(err);
+    });
+
+    var p = node.play();
+    if (p && p.catch) p.catch(function () {});
     stage.appendChild(node);
 
+    // Strictly NO video titles or descriptions in the modal
     info.innerHTML = '';
-    var h = document.createElement('h3'); h.textContent = item.title || '';
-    var t = document.createElement('span'); t.className = 'tag'; t.textContent = item.category || '';
-    info.appendChild(h); info.appendChild(t);
-    if (item.desc) { var d = document.createElement('p'); d.textContent = item.desc; info.appendChild(d); }
-    if (isRef && item.credit) {
-      var c = document.createElement('p');
-      c.appendChild(document.createTextNode('Credit: '));
-      var url = safeUrl(item.link);
-      if (url) {
-        var a = document.createElement('a');
-        a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = item.credit;
-        c.appendChild(a);
-      } else {
-        c.appendChild(document.createTextNode(item.credit));
-      }
-      info.appendChild(c);
+    if (item.category) {
+      var t = document.createElement('span');
+      t.className = 'tag';
+      t.textContent = item.category;
+      info.appendChild(t);
     }
 
     modal.hidden = false;
@@ -239,27 +414,26 @@
 
   function closeModal() {
     if (!modal || modal.hidden) return;
-    stage.innerHTML = '';          // removing the player stops video/audio
+    stage.innerHTML = '';
     modal.hidden = true;
     modalOpen = false;
     document.documentElement.classList.remove('modal-open');
-    visible.forEach(function (v) { startVideo(v); });
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
 
-  /* ---------- go ---------- */
-  var frag = document.createDocumentFragment();
+  /* ---------- initialize ---------- */
   items.forEach(function (it) {
     var c = makeCard(it);
     cards.push(c);
-    frag.appendChild(c);
   });
-  grid.appendChild(frag);
+
+  // Render stable 32-video balanced mixed selection in "All"
+  displayItems(allMixedItems.length > 0 ? allMixedItems : items);
 
   if (!items.length) {
     var msg = document.createElement('p');
     msg.className = 'empty-msg';
-    msg.textContent = isRef ? 'No verified references added yet. Add creator credit and the original source in js/data.js.' : 'No videos are currently listed.';
+    msg.textContent = isRef ? 'No verified references added yet.' : 'No videos are currently listed.';
     grid.parentNode.insertBefore(msg, grid.nextSibling);
   }
 
