@@ -55,13 +55,6 @@ window.DATA = {
       full: "assets/videos/original/challenge/chl4.mp4"
     },
     {
-      title: "Challenge 5",
-      category: "Challenges",
-      ratio: "9/16",
-      preview: "assets/videos/preview/challenge/chl5-preview.mp4",
-      full: "assets/videos/original/challenge/chl5.mp4"
-    },
-    {
       title: "Challenge 6",
       category: "Challenges",
       ratio: "9/16",
