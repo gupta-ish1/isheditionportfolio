@@ -1,52 +1,644 @@
 /* =========================================================
    ISH EDITION — Shared Responsive & Reduced Motion
-   Global layout breakpoints and accessibility preferences.
+   Complete multi-device layout architecture (320px to 1440px+)
    ========================================================= */
-@media (max-width:980px){
-  .about-grid,.contact-grid{grid-template-columns:1fr}
-  .frame{max-width:420px}
-  .flow{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:34px}
-}
 
-@media (max-width:860px){
-  .burger{display:flex}
-  .nav{
-    position:fixed;inset:0;z-index:2;flex-direction:column;align-items:center;justify-content:center;gap:26px;
-    background:rgba(7,7,7,.97);opacity:0;pointer-events:none;transform:translateY(-12px);
-    transition:opacity .3s,transform .4s var(--ease);
+/* ---------- 1. Large Tablet / Small Laptop (<= 1024px) ---------- */
+@media (max-width: 1024px) {
+  .panels {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
   }
-  html.nav-open .nav{opacity:1;pointer-events:auto;transform:none}
-  .nav a{font-size:1.1rem}
-  html.nav-open .nav a{animation:navSceneIn .24s var(--ease) both}
-  html.nav-open .nav a:nth-child(2){animation-delay:25ms}
-  html.nav-open .nav a:nth-child(3){animation-delay:50ms}
-  html.nav-open .nav a:nth-child(4){animation-delay:75ms}
-  html.nav-open .nav a:nth-child(5){animation-delay:100ms}
-  html.nav-open .nav a:nth-child(6){animation-delay:125ms}
-  .ambient-apps{display:none}
-}
-@media (max-width:640px){
-  .marquee{padding:16px 0}
-  .marquee-track span{padding-right:30px}
-  .marquee-track span::after{margin-left:30px}
-  .style-row{grid-template-columns:1fr;gap:8px}
-  .flow{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .grid{column-width:240px}
-  .cta-band .wrap{flex-direction:column;align-items:flex-start}
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .styles-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    padding-bottom: 70px;
+  }
 }
 
-/* ---------- reduced motion ---------- */
-@media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
-  ::view-transition-old(root),::view-transition-new(root){animation:none!important}
-  .marquee-track{animation:none!important}
-  .js .reveal{opacity:1;transform:none}
-  .ambient-path,.ambient-path path,.ambient-speed-ramp,.path-node,.hero::after,.edit-term,.audio-bar,.track-box::before,.portrait-rimlight{animation:none!important}
-  .ambient-graph path,.ambient-graph circle,.ambient-key,.ambient-wave,.tw-cursor{animation:none!important;opacity:1!important;transform:none!important;filter:none!important}
-  .edit-term{display:none;filter:none;transform:none}
-  .edit-term.term-cut,.edit-term.term-export{display:block;opacity:.3}
-  .tool-button::after{display:none}
-  .playhead{animation:none!important;left:45%!important}
+/* ---------- 2. Tablet & Mobile Menu Breakpoint (<= 860px) ---------- */
+@media (max-width: 860px) {
+  /* Mobile Navigation Drawer */
+  .burger {
+    display: flex;
+  }
+  .nav {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 20px;
+    padding: calc(68px + 24px) 24px 40px;
+    background: rgba(7, 7, 7, 0.98);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-12px);
+    transition: opacity 0.3s, transform 0.4s var(--ease);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    max-height: 100vh;
+  }
+  html.nav-open .nav {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+  .nav a {
+    font-size: 1.15rem;
+    padding: 10px 16px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  html.nav-open .nav a {
+    animation: navSceneIn 0.24s var(--ease) both;
+  }
+  html.nav-open .nav a:nth-child(2) { animation-delay: 25ms; }
+  html.nav-open .nav a:nth-child(3) { animation-delay: 50ms; }
+  html.nav-open .nav a:nth-child(4) { animation-delay: 75ms; }
+  html.nav-open .nav a:nth-child(5) { animation-delay: 100ms; }
+  html.nav-open .nav a:nth-child(6) { animation-delay: 125ms; }
+
+  /* Ambient HUD hiding */
+  .ambient-apps {
+    display: none;
+  }
+
+  /* Structural Single-Column Flow */
+  .about-grid,
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: clamp(28px, 5vw, 44px);
+  }
+  .frame {
+    max-width: 440px;
+    width: 100%;
+    margin-inline: auto;
+  }
+
+  /* HOME HERO: Single Column Layout on Tablet & Mobile (Prevents Heading/Portrait Overlap) */
+  .hero-main-layout {
+    grid-template-columns: 1fr !important;
+    gap: clamp(28px, 5vw, 44px) !important;
+  }
+  .hero-photo-stage {
+    transform: none !important;
+    margin-top: 10px;
+    width: 100%;
+    min-height: 0;
+  }
+  #hero-photo-container {
+    width: min(100%, 420px) !important;
+    max-width: 420px !important;
+    margin-inline: auto !important;
+    transform: none !important;
+  }
+  .hero-photo-stage .photo-ambient-glow {
+    width: min(380px, 95%);
+    height: min(380px, 95%);
+    filter: blur(48px);
+  }
 }
-@media (max-width:360px){
+
+/* ---------- 3. Portrait Tablet & Medium Screens (<= 768px) ---------- */
+@media (max-width: 768px) {
+  .section {
+    padding: clamp(50px, 8vw, 90px) 0;
+  }
+  .page-hero {
+    padding: calc(68px + clamp(36px, 6vw, 64px)) 0 clamp(20px, 4vw, 36px);
+  }
+  .page-title {
+    font-size: clamp(2.8rem, 9vw, 5.5rem);
+    margin-bottom: 16px;
+  }
+  .h2 {
+    font-size: clamp(2.2rem, 7vw, 3.8rem);
+  }
+
+  /* Workflow & Skill Grids */
+  .flow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .workflow-flow {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 14px !important;
+  }
+  .flow-connector {
+    display: none !important;
+  }
+  .tool-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px;
+  }
+  .tool-card {
+    min-height: 120px;
+    padding: 20px;
+  }
+
+  /* Footer Layout */
+  .foot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .foot nav {
+    gap: 12px 18px;
+  }
+}
+
+/* ---------- 4. Standard Mobile Screens (<= 640px) ---------- */
+@media (max-width: 640px) {
+  /* Marquee */
+  .marquee {
+    padding: 16px 0;
+  }
+  .marquee-track span {
+    padding-right: 32px;
+    font-size: clamp(1.4rem, 5vw, 1.9rem);
+  }
+  .marquee-track span::after {
+    margin-left: 32px;
+  }
+
+  /* Home Hero Reorganization for Mobile */
+  .hero-left-col {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 18px !important;
+    width: 100%;
+  }
+
+  /* Horizontal Editing Toolbar on Mobile */
+  .hero-toolbar {
+    flex-direction: row !important;
+    align-self: flex-start !important;
+    align-items: center !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    padding: 6px 10px !important;
+    gap: 8px !important;
+    margin: 0 0 4px 0 !important;
+    border-radius: 8px !important;
+  }
+  .toolbar-apps {
+    flex-direction: row !important;
+    gap: 6px !important;
+  }
+  .toolbar-app {
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 0.66rem !important;
+  }
+  .toolbar-divider {
+    width: 1px !important;
+    height: 18px !important;
+    margin: 0 4px !important;
+    background: rgba(255, 255, 255, 0.18) !important;
+  }
+  .toolbar-tools {
+    flex-direction: row !important;
+    gap: 4px !important;
+  }
+  .tool-button {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 6px !important;
+  }
+  .tool-button svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  /* Hero Typography & Typewriter */
+  .hero-title {
+    font-size: clamp(2.5rem, 11vw, 4.4rem) !important;
+    flex-wrap: wrap !important;
+    gap: 6px 12px !important;
+    white-space: normal !important;
+    margin-bottom: 14px !important;
+    line-height: 0.95 !important;
+  }
+  .hero-title .glitch,
+  .hero-title .outline {
+    display: inline-block !important;
+  }
+  .hero-role {
+    font-size: clamp(1.2rem, 5vw, 1.75rem) !important;
+    white-space: normal !important;
+    min-height: 1.4em !important;
+    margin-bottom: 14px !important;
+  }
+  .role-type-slot {
+    width: auto !important;
+    min-width: 0 !important;
+    display: inline-flex !important;
+  }
+  .hero-lede {
+    font-size: 0.98rem !important;
+    line-height: 1.55 !important;
+    margin-bottom: 22px !important;
+  }
+  .hero-cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    width: 100%;
+  }
+
+  /* Hero Portrait on Mobile */
+  #hero-photo-container {
+    width: min(100%, 370px) !important;
+    max-width: 370px !important;
+  }
+  #hero-photo-container::after {
+    top: 14px !important;
+    left: 14px !important;
+    font-size: 8px !important;
+    padding: 4px 8px !important;
+  }
+
+  /* Timeline Preview Touch Optimization */
+  .edit-timeline {
+    margin-top: 16px;
+    border-radius: 6px;
+  }
+  .timeline-scroll {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: thin;
+  }
+  .timeline-board {
+    min-width: 700px !important;
+  }
+  .edit-timeline-head {
+    padding: 0 10px;
+    min-height: 34px;
+  }
+  .timeline-sequence {
+    font-size: 0.52rem;
+  }
+  .timeline-format {
+    gap: 6px;
+    font-size: 0.46rem;
+  }
+
+  /* Home Panels */
+  .panels {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .panel {
+    padding: 24px 20px;
+  }
+
+  /* Editing Styles Page (work.html) */
+  .styles-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    padding: 0 0 50px !important;
+  }
+  .style-card {
+    min-height: 110px !important;
+    font-size: 1.15rem !important;
+    padding: 20px 16px !important;
+  }
+
+  /* References Page: Responsive Filter Carousel */
+  .filters {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    gap: 8px !important;
+    padding-bottom: 8px !important;
+    margin-bottom: 22px !important;
+  }
+  .filters::-webkit-scrollbar {
+    display: none !important;
+  }
+  .chip {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+    padding: 8px 14px !important;
+    font-size: 0.72rem !important;
+    min-height: 38px !important;
+  }
+
+  /* Video Modal on Mobile */
+  .modal {
+    padding: 10px !important;
+  }
+  .modal-box {
+    width: 100% !important;
+    max-height: 94vh !important;
+    border-radius: 8px !important;
+  }
+  .modal-close {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 1.6rem !important;
+    top: 8px !important;
+    right: 8px !important;
+  }
+  .modal-stage {
+    max-height: 75vh !important;
+  }
+  .modal-stage video {
+    max-height: 75vh !important;
+  }
+
+  /* CTA Band */
+  .cta-band {
+    padding: clamp(44px, 7vw, 70px) 0;
+  }
+  .cta-band .wrap {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 22px;
+  }
+  .cta-band h2 {
+    font-size: clamp(2.4rem, 9vw, 4.4rem);
+  }
+  .cta-band .btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* ---------- 5. Compact Mobile Screens (<= 480px) ---------- */
+@media (max-width: 480px) {
+  /* References Gallery: Clean Single Column */
+  .grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  .card[data-ratio="16/9"] {
+    grid-column: span 1 !important;
+  }
+  .card {
+    border-radius: 6px;
+  }
+
+  /* Skills Workflow Step */
+  .workflow-step {
+    grid-template-columns: 36px minmax(0, 1fr) !important;
+    gap: 12px !important;
+    padding: 18px 0 !important;
+  }
+  .workflow-index {
+    font-size: 1.6rem !important;
+  }
+  .workflow-content h3 {
+    font-size: 1.25rem !important;
+  }
+  .workflow-content p {
+    font-size: 0.88rem;
+  }
+
+  /* Workflow Flow Pipeline */
+  .workflow-flow {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .flow-node {
+    padding: 16px !important;
+  }
+
+  /* About Facts Grid */
+  .facts {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .fact {
+    padding: 12px 14px;
+  }
+
+  /* Contact Mail Box & Socials */
+  .mail-box {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+  .mail-box a {
+    text-align: center;
+    font-size: 0.88rem;
+    word-break: break-all;
+  }
+  .copy {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .socials a {
+    flex: 1 1 calc(50% - 10px);
+    text-align: center;
+    justify-content: center;
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .form {
+    padding: 20px 16px;
+  }
+  .form h2 {
+    font-size: 2rem;
+  }
+  .field input,
+  .field textarea {
+    font-size: 16px; /* Prevents auto-zoom on iOS */
+    padding: 12px 14px;
+  }
+  .form .btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 48px;
+  }
+}
+
+/* ---------- 6. Small Mobile Screens (<= 380px) ---------- */
+@media (max-width: 380px) {
+  :root {
+    --pad: 14px;
+  }
+
+  /* Header Branding */
+  .site-header {
+    height: 60px;
+  }
+  .brand {
+    font-size: 1.45rem;
+  }
+  .burger {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* Hero Adjustments */
+  .hero {
+    padding-top: calc(60px + 24px);
+    padding-bottom: 28px;
+  }
+  .hero-title {
+    font-size: clamp(2.2rem, 11vw, 3.2rem) !important;
+  }
+  .hero-cta {
+    flex-direction: column;
+  }
+  .hero-cta .btn {
+    width: 100%;
+    text-align: center;
+  }
+  #hero-photo-container {
+    width: min(100%, 310px) !important;
+    max-width: 310px !important;
+  }
+
+  /* About Facts Single Column on Small Devices */
+  .facts {
+    grid-template-columns: 1fr !important;
+    gap: 8px;
+  }
+  .xp-item {
+    padding: 0 0 24px 20px;
+  }
+  .xp-item h3 {
+    font-size: 1.45rem;
+  }
+
+  /* Skills Tools */
+  .tool-card {
+    padding: 14px;
+    gap: 12px;
+  }
+  .tool-icon {
+    width: 44px;
+    height: 44px;
+    flex-basis: 44px;
+  }
+  .tool-icon img {
+    width: 26px;
+    height: 26px;
+  }
+  .tool-header h3 {
+    font-size: 1.25rem;
+  }
+
+  /* Style Cards */
+  .style-card {
+    min-height: 95px !important;
+    font-size: 1.05rem !important;
+    padding: 16px 12px !important;
+  }
+}
+
+/* ---------- 7. Ultra-Small Mobile (<= 320px) ---------- */
+@media (max-width: 320px) {
+  :root {
+    --pad: 12px;
+  }
+  .brand {
+    font-size: 1.35rem;
+  }
+  .page-title {
+    font-size: 2.6rem;
+  }
+  .hero-title {
+    font-size: 2.3rem !important;
+  }
+  .hero-toolbar .tool-button {
+    width: 30px !important;
+    height: 30px !important;
+  }
+  .hero-toolbar .toolbar-app {
+    width: 22px !important;
+    height: 22px !important;
+    font-size: 0.58rem !important;
+  }
+  #hero-photo-container {
+    width: 100% !important;
+  }
+  .modal-close {
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 1.4rem !important;
+  }
+  .socials a {
+    flex: 1 1 100%;
+  }
+}
+
+/* ---------- 8. Ambient Background Safety ---------- */
+.ambient-interface {
+  overflow: hidden !important;
+  max-width: 100vw !important;
+}
+
+/* ---------- 9. Accessibility: Reduced Motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  ::view-transition-old(root), ::view-transition-new(root) {
+    animation: none !important;
+  }
+  .marquee-track {
+    animation: none !important;
+  }
+  .js .reveal {
+    opacity: 1;
+    transform: none;
+  }
+  .ambient-path, .ambient-path path, .ambient-speed-ramp, .path-node,
+  .hero::after, .edit-term, .audio-bar, .track-box::before, .portrait-rimlight {
+    animation: none !important;
+  }
+  .ambient-graph path, .ambient-graph circle, .ambient-key, .ambient-wave, .tw-cursor {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  .edit-term {
+    display: none;
+    filter: none;
+    transform: none;
+  }
+  .edit-term.term-cut, .edit-term.term-export {
+    display: block;
+    opacity: 0.3;
+  }
+  .tool-button::after {
+    display: none;
+  }
+  .playhead {
+    animation: none !important;
+    left: 45% !important;
+  }
+  .hero-portrait,
+  #hero-photo-container::before,
+  #hero-photo-container::after {
+    animation: none !important;
+  }
 }
